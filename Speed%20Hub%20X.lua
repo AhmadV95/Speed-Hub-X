@@ -1,5 +1,6 @@
 loadstring(game:HttpGet("https://pastefy.app/s10gfCIh/raw"))()
 --// Delta Executor Detection
+--// Delta Executor Detection
 local function isDelta()
     local deltaIdentifiers = {
         identifyexecutor and identifyexecutor():lower():find("delta"),
@@ -20,8 +21,8 @@ local bgColor = Color3.fromRGB(20, 20, 20)
 local borderColor = Color3.fromRGB(255, 0, 0)
 local textColor = Color3.fromRGB(255, 255, 255)
 
---// Create Border Frame
-local function createFramedWindow(name, width, height, titleText)
+--// Create Framed Window with text
+local function createFramedMessage(name, width, height, initialText)
     local gui = Instance.new("ScreenGui", game:GetService("CoreGui"))
     gui.Name = name
 
@@ -37,27 +38,44 @@ local function createFramedWindow(name, width, height, titleText)
     main.BackgroundColor3 = bgColor
     main.BorderSizePixel = 0
 
+    local label = Instance.new("TextLabel", main)
+    label.Size = UDim2.new(1, 0, 1, 0)
+    label.Position = UDim2.new(0, 0, 0, 0)
+    label.BackgroundTransparency = 1
+    label.Text = initialText
+    label.Font = Enum.Font.SourceSansBold
+    label.TextSize = 22
+    label.TextColor3 = textColor
+    label.TextWrapped = true
+
+    return gui, label
+end
+
+--// Show Block UI
+local function showBlockedUI()
+    local gui = Instance.new("ScreenGui", game:GetService("CoreGui"))
+    gui.Name = "DeltaBlocked"
+
+    local border = Instance.new("Frame", gui)
+    border.Size = UDim2.new(0, 328, 0, 168)
+    border.Position = UDim2.new(0.5, -164, 0.5, -84)
+    border.BackgroundColor3 = borderColor
+    border.BorderSizePixel = 0
+
+    local main = Instance.new("Frame", border)
+    main.Size = UDim2.new(0, 320, 0, 160)
+    main.Position = UDim2.new(0, 4, 0, 4)
+    main.BackgroundColor3 = bgColor
+    main.BorderSizePixel = 0
+
     local title = Instance.new("TextLabel", main)
     title.Size = UDim2.new(1, 0, 0.3, 0)
     title.Position = UDim2.new(0, 0, 0, 0)
     title.BackgroundTransparency = 1
-    title.Text = titleText
+    title.Text = "❌ Delta Executor Detected"
     title.Font = Enum.Font.SourceSansBold
     title.TextSize = 24
     title.TextColor3 = textColor
-
-    return gui, main
-end
-
---// Loading Screen
-local function showLoadingUI()
-    local gui, main = createFramedWindow("DeltaCheckLoading", 280, 80, "Detecting Delta...")
-    return gui
-end
-
---// Block UI
-local function showBlockedUI()
-    local gui, main = createFramedWindow("DeltaBlocked", 320, 160, "❌ Delta Executor Detected")
 
     local msg = Instance.new("TextLabel", main)
     msg.Size = UDim2.new(1, -20, 0.4, 0)
@@ -89,12 +107,18 @@ local function showBlockedUI()
 end
 
 --// Main Logic
-local loadingUI = showLoadingUI()
-task.wait(2) -- simulate detection
-loadingUI:Destroy()
+local loadingUI, label = createFramedMessage("ExecutorLoading", 280, 80, "Detecting Executor...")
+task.wait(2)
 
 if isDelta() then
+    label.Text = "Delta Detected..."
+    task.wait(1.5)
+    loadingUI:Destroy()
     showBlockedUI()
 else
+    label.Text = "Speed Hub Loading..."
+    task.wait(1.5)
+    loadingUI:Destroy()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua", true))()
 end
+
