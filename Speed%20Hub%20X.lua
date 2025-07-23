@@ -1,5 +1,3 @@
-
---// Delta Executor Detection
 local function isDelta()
     local deltaIdentifiers = {
         identifyexecutor and identifyexecutor():lower():find("delta"),
