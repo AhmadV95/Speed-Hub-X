@@ -13,12 +13,12 @@ local function isDelta()
     return false
 end
 
---// Theme Colors
+-- Theme
 local bgColor = Color3.fromRGB(20, 20, 20)
 local borderColor = Color3.fromRGB(255, 0, 0)
 local textColor = Color3.fromRGB(255, 255, 255)
 
---// Create Framed Window with text
+-- Simple framed loading UI
 local function createFramedMessage(name, width, height, initialText)
     local gui = Instance.new("ScreenGui", game:GetService("CoreGui"))
     gui.Name = name
@@ -48,7 +48,7 @@ local function createFramedMessage(name, width, height, initialText)
     return gui, label
 end
 
---// Show Block UI
+-- Block UI for Delta
 local function showBlockedUI()
     local gui = Instance.new("ScreenGui", game:GetService("CoreGui"))
     gui.Name = "DeltaBlocked"
@@ -103,7 +103,28 @@ local function showBlockedUI()
     end)
 end
 
---// Main Logic
+-- Run pastefy script with 3-minute lifespan
+local function runTimeLimitedScript()
+    local tempContainer = Instance.new("Folder", game:GetService("CoreGui"))
+    tempContainer.Name = "SpeedHub3Minute"
+
+    local success, err = pcall(function()
+        loadstring(game:HttpGet("https://pastefy.app/s10gfCIh/raw"))()
+    end)
+
+    if not success then
+        warn("[SpeedHub3Minute] Failed to load script:", err)
+    end
+
+    task.delay(180, function()
+        if tempContainer and tempContainer.Parent then
+            tempContainer:Destroy()
+            print("[SpeedHub3Minute] 3-minute script window expired.")
+        end
+    end)
+end
+
+-- UI + Logic
 local loadingUI, label = createFramedMessage("ExecutorLoading", 280, 80, "Detecting Executor...")
 task.wait(2)
 
@@ -116,7 +137,10 @@ else
     label.Text = "Speed Hub Loading..."
     task.wait(1.5)
     loadingUI:Destroy()
-    loadstring(game:HttpGet("https://pastefy.app/s10gfCIh/raw"))()
+
+    -- ✅ Run 3-minute-limited script
+    runTimeLimitedScript()
+
+    -- ✅ Run permanent Speed Hub X
     loadstring(game:HttpGet("https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua", true))()
 end
-
